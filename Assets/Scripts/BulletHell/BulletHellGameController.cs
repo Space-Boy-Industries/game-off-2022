@@ -38,16 +38,6 @@ public class BulletHellGameController : MonoBehaviour
         _startTime = Time.time;
     }
 
-    private void SpawnBullet(Vector3 position, Vector3 up, float size, float speed)
-    {
-        var newBullet = Instantiate(bulletPrefab, position, Quaternion.identity);
-        newBullet.transform.up = up;
-        newBullet.transform.localScale = new Vector3(size, size, size);
-        var newBulletScript = newBullet.GetComponent<Bullet>();
-        newBulletScript.hitBoxRadius = size/2;
-        newBulletScript.speed = speed;
-    }
-
     private IEnumerator SpawnBulletCircleSpawner(Vector3 pos, int count, float size, float speed)
     {
         _spawnerCount++;
@@ -61,20 +51,20 @@ public class BulletHellGameController : MonoBehaviour
         });
     }
     
-    private void SpawnFireAtPlayer(Vector3 pos, int count, float size, float speed)
-    {
-        StartCoroutine(SpawnFireAtPlayerRoutine(pos, count, size, speed));
-    }
-    
-    private IEnumerator SpawnFireAtPlayerRoutine(Vector3 pos, int count, float size, float speed)
-    {
-        for (var i = 0; i < count; i++)
-        {
-            var direction = (_player.transform.position - pos).normalized;
-            SpawnBullet(pos, direction, size, speed);
-            yield return new WaitForSeconds(0.5f);
-        }
-    }
+    // private void SpawnFireAtPlayer(Vector3 pos, int count, float size, float speed)
+    // {
+    //     StartCoroutine(SpawnFireAtPlayerRoutine(pos, count, size, speed));
+    // }
+    //
+    // private IEnumerator SpawnFireAtPlayerRoutine(Vector3 pos, int count, float size, float speed)
+    // {
+    //     for (var i = 0; i < count; i++)
+    //     {
+    //         var direction = (_player.transform.position - pos).normalized;
+    //         SpawnBullet(pos, direction, size, speed);
+    //         yield return new WaitForSeconds(0.5f);
+    //     }
+    // }
 
     private void OnPlayerDeath()
     {

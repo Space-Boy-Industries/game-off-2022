@@ -37,7 +37,7 @@ public class SimpleTopDownCharacterController : MonoBehaviour, IShootable
 
     private void FixedUpdate()
     {
-        _velocity += _moveInput * acceleration * Time.fixedDeltaTime;
+        _velocity += _moveInput * (acceleration * Time.fixedDeltaTime);
         _velocity = Vector2.ClampMagnitude(
             _velocity,
             _isPrecisionMode ? maxPrecisionSpeed : maxSpeed
