@@ -251,6 +251,7 @@ GameObject:
   m_Component:
   - component: {fileID: 572851221}
   - component: {fileID: 572851222}
+  - component: {fileID: 572851224}
   m_Layer: 0
   m_Name: Bullet Hell Game Controller
   m_TagString: Untagged
@@ -303,6 +304,22 @@ MonoBehaviour:
   onGameOver:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &572851224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 572851220}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6cefb6eb7e6e764b8e739102fad229a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 0
+  ObjectivePrompt: Smile More
+  ControlsPrompt:
+  - Smile More
 --- !u!1 &598556948
 GameObject:
   m_ObjectHideFlags: 0

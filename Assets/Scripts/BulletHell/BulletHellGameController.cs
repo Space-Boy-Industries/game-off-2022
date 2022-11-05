@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
+[RequireComponent(typeof(MinigameController))]
 public class BulletHellGameController : MonoBehaviour
 {
     //config
@@ -30,9 +31,10 @@ public class BulletHellGameController : MonoBehaviour
     private int _spawnerCount;
     private bool _gameOver;
     private float _startTime;
-    
+
     // cached dependencies
     private GameObject _player;
+    private MinigameController _minigameController;
 
     // cached camera bounds in world space
     private Vector2 _minBounds;
@@ -40,6 +42,8 @@ public class BulletHellGameController : MonoBehaviour
 
     private void Start()
     {
+        _minigameController = GetComponent<MinigameController>();
+        
         _player = GameObject.FindWithTag("Player");
         _player.GetComponent<SimpleTopDownCharacterController>().onDeath.AddListener(OnPlayerDeath);
         
@@ -61,8 +65,16 @@ public class BulletHellGameController : MonoBehaviour
         SpawnCollider(new Vector2(0, _maxBounds.y), new Vector3(_maxBounds.x * 2, 0.5f, 1.0f));
         // bottom
         SpawnCollider(new Vector2(0, _minBounds.y), new Vector3(_maxBounds.x * 2, 0.5f, 1.0f));
+        
+        // _minigameController.OnStart.AddListener(() =>
+        // {
+        //    TODO: spawn palyer 
+        // });
+
+        var test = FindObjectOfType<GameController>();
+        Debug.Log(test);
     }
-    
+
     private void SpawnCollider(Vector3 pos, Vector3 size)
     {
         var go = new GameObject("Collider")
@@ -120,6 +132,8 @@ public class BulletHellGameController : MonoBehaviour
 
     private void OnPlayerDeath()
     {
+        _minigameController.Fail();
+        
         _gameOver = true;
         gameOverPanel.SetActive(true);
         onGameOver.Invoke();
@@ -127,6 +141,7 @@ public class BulletHellGameController : MonoBehaviour
 
     private void Update()
     {
+        if (_minigameController.State != MinigameState.Playing) return;
         if (_gameOver) return;
         
         var timeLeft = duration - (Time.time - _startTime);
