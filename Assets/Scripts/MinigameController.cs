@@ -54,6 +54,7 @@ public class MinigameController : MonoBehaviour
     public UnityEvent OnReady { get; private set; }
     public UnityEvent OnStart { get; private set; }
     public UnityEvent OnEnd { get; private set; }
+    public UnityEvent OnDone { get; private set; }
     public MinigameState State { get; private set; }
     public float TimeRemaining {
         get {
@@ -69,6 +70,7 @@ public class MinigameController : MonoBehaviour
         OnReady = new UnityEvent();
         OnStart = new UnityEvent();
         OnEnd = new UnityEvent();
+        OnDone = new UnityEvent();
         State = MinigameState.NotReady;
     }
 
@@ -112,24 +114,26 @@ public class MinigameController : MonoBehaviour
     public void Succeed()
     {
         State = MinigameState.Success;
+        OnEnd.Invoke();
 
         // TODO: Display success message
 
         StartCoroutine(Utility.CallbackAfter(PromptDuration, () =>
         {
-            OnEnd.Invoke();
+            OnDone.Invoke();
         }));
     }
 
     public void Fail()
     {
         State = MinigameState.Failure;
+        OnEnd.Invoke();
 
         // TODO: Display failure message
 
         StartCoroutine(Utility.CallbackAfter(PromptDuration, () =>
         {
-            OnEnd.Invoke();
+            OnDone.Invoke();
         }));
     }
 }
