@@ -64,7 +64,7 @@ public class MinigameController : MonoBehaviour
     private float _startTime;
     private float _duration;
 
-    public void Init()
+    void Awake()
     {
         OnReady = new UnityEvent();
         OnStart = new UnityEvent();

@@ -74,7 +74,6 @@ public class GameController : MonoBehaviour
             }
         }
 
-        _currentMinigame.Init();
         _currentMinigame.OnEnd.AddListener(() => {
             if(_currentMinigame.State == MinigameState.Success)
             {
