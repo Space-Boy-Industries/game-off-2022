@@ -4,21 +4,25 @@ using UnityEngine.Events;
 
 public class SimpleTopDownCharacterController : MonoBehaviour, IShootable
 {
+    // player configuration
     public float acceleration = 10f;
     public float maxSpeed = 5f;
     public float maxPrecisionSpeed = 2f;
     public int maxHealth = 100;
     
+    // events
     public UnityEvent onDeath;
-
+    
+    // player state
+    private Vector2 _velocity;
+    private int _health;
+    
+    // input state
     private InputMap _input;
     private Vector2 _moveInput;
     private Vector2 _mousePos;
-    private Vector2 _velocity;
     private bool _isPrecisionMode;
-    private int _health;
-
-    // Start is called before the first frame update
+    
     private void Start()
     {
         _input = new InputMap();
