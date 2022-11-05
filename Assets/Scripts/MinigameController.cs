@@ -64,23 +64,12 @@ public class MinigameController : MonoBehaviour
     private float _startTime;
     private float _duration;
 
-    public static MinigameController Instance;
-
-    void Awake()
+    public void Init()
     {
-        if (Instance)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            Instance = this;
-
-            OnReady = new UnityEvent();
-            OnStart = new UnityEvent();
-            OnEnd = new UnityEvent();
-            State = MinigameState.NotReady;
-        }
+        OnReady = new UnityEvent();
+        OnStart = new UnityEvent();
+        OnEnd = new UnityEvent();
+        State = MinigameState.NotReady;
     }
 
     void Start()
@@ -123,12 +112,24 @@ public class MinigameController : MonoBehaviour
     public void Succeed()
     {
         State = MinigameState.Success;
-        OnEnd.Invoke();
+
+        // TODO: Display success message
+
+        Utility.CallbackAfter(PromptDuration, () =>
+        {
+            OnEnd.Invoke();
+        });
     }
 
     public void Fail()
     {
         State = MinigameState.Failure;
-        OnEnd.Invoke();
+
+        // TODO: Display failure message
+
+        Utility.CallbackAfter(PromptDuration, () =>
+        {
+            OnEnd.Invoke();
+        });
     }
 }
