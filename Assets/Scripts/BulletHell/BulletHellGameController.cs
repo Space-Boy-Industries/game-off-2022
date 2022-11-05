@@ -57,7 +57,7 @@ public class BulletHellGameController : MonoBehaviour
             SpawnCollider(new Vector2(0, _minBounds.y), new Vector3(_maxBounds.x * 2, 0.5f, 1.0f));
             
             // spawn player
-            _player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+            _player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, transform);
             _player.GetComponent<SimpleTopDownCharacterController>().onDeath.AddListener(OnPlayerDeath);
         });
 
@@ -104,7 +104,7 @@ public class BulletHellGameController : MonoBehaviour
         _spawnerCount++;
         
         // spawn bullet spawner
-        var circleSpawner = Instantiate(circleSpawnerPrefab, position, Quaternion.identity);
+        var circleSpawner = Instantiate(circleSpawnerPrefab, position, Quaternion.identity, transform);
         var circleSpawnerScript = circleSpawner.GetComponent<CircleBulletSpawner>();
         
         // wait for 1 second to give the players some time to react

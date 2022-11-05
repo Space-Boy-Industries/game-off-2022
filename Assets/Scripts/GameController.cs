@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -45,7 +44,6 @@ public class GameController : MonoBehaviour
 
     void Update()
     {
-        
     }
 
     void StartLevel(int index)
@@ -59,13 +57,13 @@ public class GameController : MonoBehaviour
     {
         var minigameScene = _currentLevel.MinigameScenes[_nextMinigameIndex];
         var sceneLoad = SceneManager.LoadSceneAsync(minigameScene, LoadSceneMode.Additive);
-        while(!sceneLoad.isDone)
+        while (!sceneLoad.isDone)
         {
             yield return null;
         }
 
         var minigames = FindObjectsOfType<MinigameController>();
-        foreach(var minigame in minigames)
+        foreach (var minigame in minigames)
         {
             if (minigame.gameObject.scene.name == minigameScene)
             {
@@ -74,11 +72,13 @@ public class GameController : MonoBehaviour
             }
         }
 
-        _currentMinigame.OnEnd.AddListener(() => {
-            if(_currentMinigame.State == MinigameState.Success)
+        _currentMinigame.OnEnd.AddListener(() =>
+        {
+            if (_currentMinigame.State == MinigameState.Success)
             {
                 _currentMinigame = null;
                 SceneManager.UnloadSceneAsync(minigameScene);
+                _nextMinigameIndex++;
                 TransitionCutscene();
             }
             else
@@ -95,27 +95,23 @@ public class GameController : MonoBehaviour
                 _currentMinigame.Difficulty++;
             }
         }
-
-        _nextMinigameIndex++;
     }
 
     void TransitionCutscene()
     {
-        // Load while cutscene is playing
-        StartCoroutine(LoadNextMinigame());
+        if (_nextMinigameIndex < _currentLevel.MinigameScenes.Length)
+        {
+            // Load while cutscene is playing
+            StartCoroutine(LoadNextMinigame());
 
-        // TODO: start cutscene
+            // TODO: start cutscene
 
-        // For now I'm just using CallbackAfter to simulate the cutscene playing
-        StartCoroutine(Utility.CallbackAfter(3f, () => {
-            if (_nextMinigameIndex < _currentLevel.MinigameScenes.Length)
-            {
-                _currentMinigame.Ready();
-            }
-            else
-            {
-                // TODO: End the level
-            }
-        }));
+            // For now I'm just using CallbackAfter to simulate the cutscene playing
+            StartCoroutine(Utility.CallbackAfter(3f, () => { _currentMinigame.Ready(); }));
+        }
+        else
+        {
+            // TODO: End the level
+        }
     }
 }
