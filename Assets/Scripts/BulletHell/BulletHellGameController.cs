@@ -1,14 +1,12 @@
 using System.Collections;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(MinigameController))]
 public class BulletHellGameController : MonoBehaviour
 {
     //config
-    public float duration = 15f;
     public int maxSpawners = 3;
     public float minBulletSize = 0.75f;
     public float maxBulletSize = 1.25f;
@@ -18,19 +16,12 @@ public class BulletHellGameController : MonoBehaviour
     public int maxSpawnerBulletCount = 100;
     
     // prefabs and references
+    public GameObject playerPrefab;
     public GameObject bulletPrefab;
-    public GameObject circleSpawn;
-    public TMP_Text timeText;
-    public GameObject gameOverPanel;
-    public GameObject winPanel;
-    
-    // events
-    public UnityEvent onGameOver;
+    [FormerlySerializedAs("circleSpawn")] public GameObject circleSpawnerPrefab;
 
     // state
     private int _spawnerCount;
-    private bool _gameOver;
-    private float _startTime;
 
     // cached dependencies
     private GameObject _player;
@@ -43,36 +34,37 @@ public class BulletHellGameController : MonoBehaviour
     private void Start()
     {
         _minigameController = GetComponent<MinigameController>();
-        
-        _player = GameObject.FindWithTag("Player");
-        _player.GetComponent<SimpleTopDownCharacterController>().onDeath.AddListener(OnPlayerDeath);
-        
-        if (Camera.main == null)
-        {
-            return;
-        }
-        
-        _minBounds = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0));
-        _maxBounds = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
-        _startTime = Time.time;
-        
-        // spawn colliders around camera bounds
-        // left
-        SpawnCollider(new Vector2(_minBounds.x, 0), new Vector3(0.5f, _maxBounds.y * 2, 1.0f));
-        // right
-        SpawnCollider(new Vector2(_maxBounds.x, 0), new Vector3(0.5f, _maxBounds.y * 2, 1.0f));
-        // top
-        SpawnCollider(new Vector2(0, _maxBounds.y), new Vector3(_maxBounds.x * 2, 0.5f, 1.0f));
-        // bottom
-        SpawnCollider(new Vector2(0, _minBounds.y), new Vector3(_maxBounds.x * 2, 0.5f, 1.0f));
-        
-        // _minigameController.OnStart.AddListener(() =>
-        // {
-        //    TODO: spawn palyer 
-        // });
 
-        var test = FindObjectOfType<GameController>();
-        Debug.Log(test);
+        _minigameController.OnStart.AddListener(() =>
+        {
+            var mainCam = Camera.main;
+            if (mainCam == null)
+            {
+                return;
+            }
+        
+            _minBounds = mainCam.ViewportToWorldPoint(new Vector3(0, 0, 0));
+            _maxBounds = mainCam.ViewportToWorldPoint(new Vector3(1, 1, 0));
+            
+            // spawn colliders around camera bounds
+            // left
+            SpawnCollider(new Vector2(_minBounds.x, 0), new Vector3(0.5f, _maxBounds.y * 2, 1.0f));
+            // right
+            SpawnCollider(new Vector2(_maxBounds.x, 0), new Vector3(0.5f, _maxBounds.y * 2, 1.0f));
+            // top
+            SpawnCollider(new Vector2(0, _maxBounds.y), new Vector3(_maxBounds.x * 2, 0.5f, 1.0f));
+            // bottom
+            SpawnCollider(new Vector2(0, _minBounds.y), new Vector3(_maxBounds.x * 2, 0.5f, 1.0f));
+            
+            // spawn player
+            _player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+            _player.GetComponent<SimpleTopDownCharacterController>().onDeath.AddListener(OnPlayerDeath);
+        });
+
+        _minigameController.OnEnd.AddListener(() =>
+        {
+            _player.GetComponent<SimpleTopDownCharacterController>().onDeath.RemoveListener(OnPlayerDeath);
+        });
     }
 
     private void SpawnCollider(Vector3 pos, Vector3 size)
@@ -95,7 +87,7 @@ public class BulletHellGameController : MonoBehaviour
         _spawnerCount++;
         
         // spawn bullet spawner
-        var circleSpawner = Instantiate(circleSpawn, pos, Quaternion.identity);
+        var circleSpawner = Instantiate(circleSpawnerPrefab, pos, Quaternion.identity);
         var circleSpawnerScript = circleSpawner.GetComponent<CircleBulletSpawner>();
         
         // give the players some time to react
@@ -105,12 +97,12 @@ public class BulletHellGameController : MonoBehaviour
         circleSpawnerScript.StartSpawning(count, size, speed, bulletPrefab);
         
         // if game over happens, stop spawning bullets
-        onGameOver.AddListener(circleSpawnerScript.StopEarly);
+        _minigameController.OnEnd.AddListener(circleSpawnerScript.StopEarly);
         
         // when bullet spawner is finished, remove listener and decrement spawner count
         circleSpawnerScript.doneSpawningBullets.AddListener(() =>
         {
-            onGameOver.RemoveListener(circleSpawnerScript.StopEarly);
+            _minigameController.OnEnd.RemoveListener(circleSpawnerScript.StopEarly);
             _spawnerCount--;
         });
     }
@@ -133,35 +125,12 @@ public class BulletHellGameController : MonoBehaviour
     private void OnPlayerDeath()
     {
         _minigameController.Fail();
-        
-        _gameOver = true;
-        gameOverPanel.SetActive(true);
-        onGameOver.Invoke();
     }
 
     private void Update()
     {
         if (_minigameController.State != MinigameState.Playing) return;
-        if (_gameOver) return;
-        
-        var timeLeft = duration - (Time.time - _startTime);
-        
-        if (timeLeft <= 0)
-        {
-            // disable lose handler after wining
-            if (_player)
-            {
-                _player.GetComponent<SimpleTopDownCharacterController>().onDeath.RemoveListener(OnPlayerDeath);
-            }
-            
-            _gameOver = true;
-            winPanel.SetActive(true);
-            
-            onGameOver.Invoke();
-        }
-        
-        timeText.text = timeLeft.ToString("F2");
-        
+
         if (!_player) return;
         if (_spawnerCount >= maxSpawners) return;
         
