@@ -286,11 +286,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   duration: 15
-  maxSpawners: 3
+  maxSpawners: 4
   minBulletSize: 0.8
   maxBulletSize: 0.9
   minBulletSpeed: 8
-  maxBulletSpeed: 10
+  maxBulletSpeed: 12
   minSpawnerBulletCount: 30
   maxSpawnerBulletCount: 100
   bulletPrefab: {fileID: 5993260201444244918, guid: 9a119fae1aad01f4b956c55321944b51,

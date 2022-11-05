@@ -51,6 +51,30 @@ public class BulletHellGameController : MonoBehaviour
         _minBounds = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0));
         _maxBounds = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
         _startTime = Time.time;
+        
+        // spawn colliders around camera bounds
+        // left
+        SpawnCollider(new Vector2(_minBounds.x, 0), new Vector3(0.5f, _maxBounds.y * 2, 1.0f));
+        // right
+        SpawnCollider(new Vector2(_maxBounds.x, 0), new Vector3(0.5f, _maxBounds.y * 2, 1.0f));
+        // top
+        SpawnCollider(new Vector2(0, _maxBounds.y), new Vector3(_maxBounds.x * 2, 0.5f, 1.0f));
+        // bottom
+        SpawnCollider(new Vector2(0, _minBounds.y), new Vector3(_maxBounds.x * 2, 0.5f, 1.0f));
+    }
+    
+    private void SpawnCollider(Vector3 pos, Vector3 size)
+    {
+        var go = new GameObject("Collider")
+        {
+            transform =
+            {
+                position = pos
+            }
+        };
+        
+        var newCollider = go.AddComponent<BoxCollider>();
+        newCollider.size = size;
     }
 
     private IEnumerator SpawnBulletCircleSpawner(Vector3 pos, int count, float size, float speed)
@@ -98,7 +122,6 @@ public class BulletHellGameController : MonoBehaviour
     {
         _gameOver = true;
         gameOverPanel.SetActive(true);
-        
         onGameOver.Invoke();
     }
 
@@ -110,13 +133,16 @@ public class BulletHellGameController : MonoBehaviour
         
         if (timeLeft <= 0)
         {
+            // disable lose handler after wining
+            if (_player)
+            {
+                _player.GetComponent<SimpleTopDownCharacterController>().onDeath.RemoveListener(OnPlayerDeath);
+            }
+            
             _gameOver = true;
             winPanel.SetActive(true);
             
             onGameOver.Invoke();
-            
-            // disable player hitbox
-            _player.GetComponent<Collider>().enabled = false;
         }
         
         timeText.text = timeLeft.ToString("F2");

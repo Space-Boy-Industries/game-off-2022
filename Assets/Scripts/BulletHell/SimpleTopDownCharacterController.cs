@@ -2,6 +2,7 @@ using DefaultNamespace;
 using UnityEngine;
 using UnityEngine.Events;
 
+[RequireComponent(typeof(Rigidbody))]
 public class SimpleTopDownCharacterController : MonoBehaviour, IShootable
 {
     // player configuration
@@ -23,6 +24,10 @@ public class SimpleTopDownCharacterController : MonoBehaviour, IShootable
     private Vector2 _mousePos;
     private bool _isPrecisionMode;
     
+    // cached components
+    private Rigidbody _rigidbody;
+    private Camera _mainCamera;
+    
     private void Start()
     {
         _input = new InputMap();
@@ -30,10 +35,13 @@ public class SimpleTopDownCharacterController : MonoBehaviour, IShootable
 
         _velocity = new Vector2(0, 0);
         _health = maxHealth;
+        _rigidbody = GetComponent<Rigidbody>();
+        _mainCamera = Camera.main;
     }
 
     private void Update()
     {
+        // read input
         _moveInput = _input.BulletHell.Move.ReadValue<Vector2>();
         _mousePos = _input.BulletHell.MousePosition.ReadValue<Vector2>();
         _isPrecisionMode = _input.BulletHell.PrecisionMode.ReadValue<float>() > 0.5;
@@ -41,24 +49,26 @@ public class SimpleTopDownCharacterController : MonoBehaviour, IShootable
 
     private void FixedUpdate()
     {
+        // apply acceleration
         _velocity += _moveInput * (acceleration * Time.fixedDeltaTime);
+        
+        // clamp speed
         _velocity = Vector2.ClampMagnitude(
             _velocity,
             _isPrecisionMode ? maxPrecisionSpeed : maxSpeed
         );
 
-        transform.position += (Vector3)_velocity * Time.fixedDeltaTime;
-
-        if (_velocity.magnitude > 0.01f)
-        {
-            transform.position += (Vector3)_velocity * Time.fixedDeltaTime;
-        }
-
+        // apply drag
         _velocity *= 0.9f;
-
-        var direction = _mousePos - (Vector2)Camera.main!.WorldToScreenPoint(transform.position);
-        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        
+        // apply velocity
+        var pos = transform.position;
+        _rigidbody.MovePosition(pos + (Vector3)_velocity * Time.deltaTime);
+        
+        // rotate player towards mouse        
+        // var direction = _mousePos - (Vector2)_mainCamera.WorldToScreenPoint(pos);
+        // var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        // _rigidbody.MoveRotation(Quaternion.AngleAxis(angle, Vector3.forward));
     }
 
     public void Heal(int amount)

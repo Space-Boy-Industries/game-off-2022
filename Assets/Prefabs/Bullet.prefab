@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5993260201444244906}
   - component: {fileID: 5993260201444244905}
   - component: {fileID: -6280695632724513408}
-  m_Layer: 0
+  m_Layer: 15
   m_Name: Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -47,10 +47,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   collisionMask:
     serializedVersion: 2
-    m_Bits: 2147483647
+    m_Bits: 55
   damage: 100
   speed: 10
-  lifeTime: 8
+  lifeTime: 5
   direction: 0
   hitBoxRadius: 0.25
 --- !u!212 &-6280695632724513408
