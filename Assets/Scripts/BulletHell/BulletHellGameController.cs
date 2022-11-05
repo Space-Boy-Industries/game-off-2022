@@ -63,7 +63,10 @@ public class BulletHellGameController : MonoBehaviour
 
         _minigameController.OnEnd.AddListener(() =>
         {
-            _player.GetComponent<SimpleTopDownCharacterController>().onDeath.RemoveListener(OnPlayerDeath);
+            if (_player)
+            {
+                _player.GetComponent<SimpleTopDownCharacterController>().onDeath.RemoveListener(OnPlayerDeath);
+            }
         });
     }
     
