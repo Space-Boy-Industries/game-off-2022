@@ -55,18 +55,31 @@ public class GameController : MonoBehaviour
         TransitionCutscene();
     }
 
-    void LoadNextMinigame()
+    IEnumerator LoadNextMinigame()
     {
         var minigameScene = _currentLevel.MinigameScenes[_nextMinigameIndex];
-        SceneManager.LoadScene(minigameScene, LoadSceneMode.Additive);
+        var sceneLoad = SceneManager.LoadSceneAsync(minigameScene, LoadSceneMode.Additive);
+        while(!sceneLoad.isDone)
+        {
+            yield return null;
+        }
 
-        _currentMinigame = FindObjectOfType<MinigameController>();
+        var minigames = FindObjectsOfType<MinigameController>();
+        foreach(var minigame in minigames)
+        {
+            if (minigame.gameObject.scene.name == minigameScene)
+            {
+                _currentMinigame = minigame;
+                break;
+            }
+        }
+
         _currentMinigame.Init();
         _currentMinigame.OnEnd.AddListener(() => {
             if(_currentMinigame.State == MinigameState.Success)
             {
-                SceneManager.UnloadSceneAsync(minigameScene);
                 _currentMinigame = null;
+                SceneManager.UnloadSceneAsync(minigameScene);
                 TransitionCutscene();
             }
             else
@@ -89,10 +102,10 @@ public class GameController : MonoBehaviour
 
     void TransitionCutscene()
     {
-        // TODO: start cutscene
-
         // Load while cutscene is playing
-        LoadNextMinigame();
+        StartCoroutine(LoadNextMinigame());
+
+        // TODO: start cutscene
 
         // For now I'm just using CallbackAfter to simulate the cutscene playing
         Utility.CallbackAfter(3f, () => {
