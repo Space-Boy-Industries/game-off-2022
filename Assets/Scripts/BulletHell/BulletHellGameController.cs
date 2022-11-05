@@ -1,25 +1,40 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
 public class BulletHellGameController : MonoBehaviour
 {
-    public GameObject bulletPrefab;
-    public GameObject circleSpawn;
+    //config
     public float duration = 15f;
     public int maxSpawners = 3;
-
+    public float minBulletSize = 0.75f;
+    public float maxBulletSize = 1.25f;
+    public float minBulletSpeed = 9f;
+    public float maxBulletSpeed = 15f;
+    public int minSpawnerBulletCount = 30;
+    public int maxSpawnerBulletCount = 100;
+    
+    // prefabs and references
+    public GameObject bulletPrefab;
+    public GameObject circleSpawn;
     public TMP_Text timeText;
     public GameObject gameOverPanel;
     public GameObject winPanel;
+    
+    // events
+    public UnityEvent onGameOver;
 
-    private GameObject _player;
+    // state
     private int _spawnerCount;
     private bool _gameOver;
     private float _startTime;
     
-    // camera bounds
+    // cached dependencies
+    private GameObject _player;
+
+    // cached camera bounds in world space
     private Vector2 _minBounds;
     private Vector2 _maxBounds;
 
@@ -40,13 +55,26 @@ public class BulletHellGameController : MonoBehaviour
 
     private IEnumerator SpawnBulletCircleSpawner(Vector3 pos, int count, float size, float speed)
     {
+        // increment spawner count
         _spawnerCount++;
+        
+        // spawn bullet spawner
         var circleSpawner = Instantiate(circleSpawn, pos, Quaternion.identity);
         var circleSpawnerScript = circleSpawner.GetComponent<CircleBulletSpawner>();
+        
+        // give the players some time to react
         yield return new WaitForSeconds(1.0f);
+        
+        // start spawning bullets
         circleSpawnerScript.StartSpawning(count, size, speed, bulletPrefab);
+        
+        // if game over happens, stop spawning bullets
+        onGameOver.AddListener(circleSpawnerScript.StopEarly);
+        
+        // when bullet spawner is finished, remove listener and decrement spawner count
         circleSpawnerScript.doneSpawningBullets.AddListener(() =>
         {
+            onGameOver.RemoveListener(circleSpawnerScript.StopEarly);
             _spawnerCount--;
         });
     }
@@ -70,6 +98,8 @@ public class BulletHellGameController : MonoBehaviour
     {
         _gameOver = true;
         gameOverPanel.SetActive(true);
+        
+        onGameOver.Invoke();
     }
 
     private void Update()
@@ -82,6 +112,8 @@ public class BulletHellGameController : MonoBehaviour
         {
             _gameOver = true;
             winPanel.SetActive(true);
+            
+            onGameOver.Invoke();
             
             // disable player hitbox
             _player.GetComponent<Collider>().enabled = false;
@@ -97,9 +129,9 @@ public class BulletHellGameController : MonoBehaviour
         
         // random position within the camera bounds. then place position outside the circle
         var position = new Vector3(Random.Range(_minBounds.x, _maxBounds.x), Random.Range(_minBounds.y, _maxBounds.y), 0);
-        var size = Random.Range(0.75f, 1.25f);
-        var speed = 10 + Random.Range(1f, 5f);
+        var size = Random.Range(minBulletSize, maxBulletSize);
+        var speed = Random.Range(minBulletSpeed, maxBulletSpeed);
         
-        StartCoroutine(SpawnBulletCircleSpawner(position, Random.Range(30, 100), size, speed));
+        StartCoroutine(SpawnBulletCircleSpawner(position, Random.Range(minSpawnerBulletCount, maxSpawnerBulletCount), size, speed));
     }
 }
