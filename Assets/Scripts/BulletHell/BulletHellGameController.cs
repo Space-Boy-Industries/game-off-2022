@@ -66,46 +66,6 @@ public class BulletHellGameController : MonoBehaviour
             _player.GetComponent<SimpleTopDownCharacterController>().onDeath.RemoveListener(OnPlayerDeath);
         });
     }
-
-    private void SpawnCollider(Vector3 pos, Vector3 size)
-    {
-        var go = new GameObject("Collider")
-        {
-            transform =
-            {
-                position = pos
-            }
-        };
-        
-        var newCollider = go.AddComponent<BoxCollider>();
-        newCollider.size = size;
-    }
-
-    private IEnumerator SpawnBulletCircleSpawner(Vector3 pos, int count, float size, float speed)
-    {
-        // increment spawner count
-        _spawnerCount++;
-        
-        // spawn bullet spawner
-        var circleSpawner = Instantiate(circleSpawnerPrefab, pos, Quaternion.identity);
-        var circleSpawnerScript = circleSpawner.GetComponent<CircleBulletSpawner>();
-        
-        // give the players some time to react
-        yield return new WaitForSeconds(1.0f);
-        
-        // start spawning bullets
-        circleSpawnerScript.StartSpawning(count, size, speed, bulletPrefab);
-        
-        // if game over happens, stop spawning bullets
-        _minigameController.OnEnd.AddListener(circleSpawnerScript.StopEarly);
-        
-        // when bullet spawner is finished, remove listener and decrement spawner count
-        circleSpawnerScript.doneSpawningBullets.AddListener(() =>
-        {
-            _minigameController.OnEnd.RemoveListener(circleSpawnerScript.StopEarly);
-            _spawnerCount--;
-        });
-    }
     
     // private void SpawnFireAtPlayer(Vector3 pos, int count, float size, float speed)
     // {
@@ -122,6 +82,50 @@ public class BulletHellGameController : MonoBehaviour
     //     }
     // }
 
+    // helper function to spawn collider wall
+    private void SpawnCollider(Vector3 pos, Vector3 size)
+    {
+        var go = new GameObject("Collider")
+        {
+            transform =
+            {
+                position = pos
+            }
+        };
+        
+        var newCollider = go.AddComponent<BoxCollider>();
+        newCollider.size = size;
+    }
+
+    // helper function to spawn circle bullet spawner
+    private void SpawnCircleBulletSpawner(Vector3 position, float size, float speed, int count)
+    {
+        // increment spawner count
+        _spawnerCount++;
+        
+        // spawn bullet spawner
+        var circleSpawner = Instantiate(circleSpawnerPrefab, position, Quaternion.identity);
+        var circleSpawnerScript = circleSpawner.GetComponent<CircleBulletSpawner>();
+        
+        // wait for 1 second to give the players some time to react
+        StartCoroutine(Utility.CallbackAfter(1.0f, () =>
+        {
+            // start spawning bullets
+            circleSpawnerScript.StartSpawning(count, size, speed, bulletPrefab);
+        
+            // if game over happens, stop spawning bullets
+            _minigameController.OnEnd.AddListener(circleSpawnerScript.StopEarly);
+        
+            // when bullet spawner is finished, remove listener and decrement spawner count
+            circleSpawnerScript.doneSpawningBullets.AddListener(() =>
+            {
+                _minigameController.OnEnd.RemoveListener(circleSpawnerScript.StopEarly);
+                _spawnerCount--;
+            });
+        }));
+    }
+    
+    // Event callback for when player dies
     private void OnPlayerDeath()
     {
         _minigameController.Fail();
@@ -141,7 +145,8 @@ public class BulletHellGameController : MonoBehaviour
         var position = new Vector3(Random.Range(_minBounds.x, _maxBounds.x), Random.Range(_minBounds.y, _maxBounds.y), 0);
         var size = Random.Range(minBulletSize, maxBulletSize);
         var speed = Random.Range(minBulletSpeed, maxBulletSpeed);
+        var count = Random.Range(minSpawnerBulletCount, maxSpawnerBulletCount);
         
-        StartCoroutine(SpawnBulletCircleSpawner(position, Random.Range(minSpawnerBulletCount, maxSpawnerBulletCount), size, speed));
+        SpawnCircleBulletSpawner(position, size, speed, count);
     }
 }
