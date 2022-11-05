@@ -99,14 +99,14 @@ public class MinigameController : MonoBehaviour
 
         // TODO: Display objective and controls
 
-        Utility.CallbackAfter(PromptDuration, () =>
+        StartCoroutine(Utility.CallbackAfter(PromptDuration, () =>
         {
             _duration = Type == MinigameType.Survival ? SurvivalTimes[Difficulty] : CompletionTimes[Difficulty];
             _startTime = Time.time;
 
             State = MinigameState.Playing;
             OnStart.Invoke();
-        });
+        }));
     }
 
     public void Succeed()
@@ -115,10 +115,10 @@ public class MinigameController : MonoBehaviour
 
         // TODO: Display success message
 
-        Utility.CallbackAfter(PromptDuration, () =>
+        StartCoroutine(Utility.CallbackAfter(PromptDuration, () =>
         {
             OnEnd.Invoke();
-        });
+        }));
     }
 
     public void Fail()
@@ -127,9 +127,9 @@ public class MinigameController : MonoBehaviour
 
         // TODO: Display failure message
 
-        Utility.CallbackAfter(PromptDuration, () =>
+        StartCoroutine(Utility.CallbackAfter(PromptDuration, () =>
         {
             OnEnd.Invoke();
-        });
+        }));
     }
 }

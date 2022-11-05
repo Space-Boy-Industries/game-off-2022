@@ -107,7 +107,7 @@ public class GameController : MonoBehaviour
         // TODO: start cutscene
 
         // For now I'm just using CallbackAfter to simulate the cutscene playing
-        Utility.CallbackAfter(3f, () => {
+        StartCoroutine(Utility.CallbackAfter(3f, () => {
             if (_nextMinigameIndex < _currentLevel.MinigameScenes.Length)
             {
                 _currentMinigame.Ready();
@@ -116,6 +116,6 @@ public class GameController : MonoBehaviour
             {
                 // TODO: End the level
             }
-        });
+        }));
     }
 }
