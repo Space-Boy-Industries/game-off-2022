@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Minigames/BulletHell/BulletHell.unity
     guid: 4195324da0a3ecc479da09a7cfc54ceb
   - enabled: 1
+    path: Assets/Minigames/ButtonMashing/ButtonMashing.unity
+    guid: b819644f16c79f24aacd4df55dceff0b
+  - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects: {}
