@@ -167,6 +167,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Button Masher",
+            "id": "aaff75c8-77e2-4c43-a392-68e6053a6537",
+            "actions": [
+                {
+                    "name": "Mash Button",
+                    "type": "Button",
+                    "id": "07b7ce98-9684-4274-91e4-3c2ec04cda84",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a363305a-7afb-40bf-9e71-5fffad1547fe",
+                    "path": "<Keyboard>/space",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "Keyboad & Mouse",
+                    "action": "Mash Button",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

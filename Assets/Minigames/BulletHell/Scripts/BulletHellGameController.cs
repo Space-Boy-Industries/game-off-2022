@@ -92,7 +92,8 @@ public class BulletHellGameController : MonoBehaviour
         {
             transform =
             {
-                position = pos
+                position = pos,
+                parent = transform
             }
         };
         

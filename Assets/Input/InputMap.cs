@@ -189,6 +189,34 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Button Masher"",
+            ""id"": ""aaff75c8-77e2-4c43-a392-68e6053a6537"",
+            ""actions"": [
+                {
+                    ""name"": ""Mash Button"",
+                    ""type"": ""Button"",
+                    ""id"": ""07b7ce98-9684-4274-91e4-3c2ec04cda84"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""a363305a-7afb-40bf-9e71-5fffad1547fe"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": ""Keyboad & Mouse"",
+                    ""action"": ""Mash Button"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -215,6 +243,9 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         m_BulletHell_Move = m_BulletHell.FindAction("Move", throwIfNotFound: true);
         m_BulletHell_MousePosition = m_BulletHell.FindAction("Mouse Position ", throwIfNotFound: true);
         m_BulletHell_PrecisionMode = m_BulletHell.FindAction("Precision Mode", throwIfNotFound: true);
+        // Button Masher
+        m_ButtonMasher = asset.FindActionMap("Button Masher", throwIfNotFound: true);
+        m_ButtonMasher_MashButton = m_ButtonMasher.FindAction("Mash Button", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -319,6 +350,39 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         }
     }
     public BulletHellActions @BulletHell => new BulletHellActions(this);
+
+    // Button Masher
+    private readonly InputActionMap m_ButtonMasher;
+    private IButtonMasherActions m_ButtonMasherActionsCallbackInterface;
+    private readonly InputAction m_ButtonMasher_MashButton;
+    public struct ButtonMasherActions
+    {
+        private @InputMap m_Wrapper;
+        public ButtonMasherActions(@InputMap wrapper) { m_Wrapper = wrapper; }
+        public InputAction @MashButton => m_Wrapper.m_ButtonMasher_MashButton;
+        public InputActionMap Get() { return m_Wrapper.m_ButtonMasher; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(ButtonMasherActions set) { return set.Get(); }
+        public void SetCallbacks(IButtonMasherActions instance)
+        {
+            if (m_Wrapper.m_ButtonMasherActionsCallbackInterface != null)
+            {
+                @MashButton.started -= m_Wrapper.m_ButtonMasherActionsCallbackInterface.OnMashButton;
+                @MashButton.performed -= m_Wrapper.m_ButtonMasherActionsCallbackInterface.OnMashButton;
+                @MashButton.canceled -= m_Wrapper.m_ButtonMasherActionsCallbackInterface.OnMashButton;
+            }
+            m_Wrapper.m_ButtonMasherActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @MashButton.started += instance.OnMashButton;
+                @MashButton.performed += instance.OnMashButton;
+                @MashButton.canceled += instance.OnMashButton;
+            }
+        }
+    }
+    public ButtonMasherActions @ButtonMasher => new ButtonMasherActions(this);
     private int m_KeyboadMouseSchemeIndex = -1;
     public InputControlScheme KeyboadMouseScheme
     {
@@ -333,5 +397,9 @@ public partial class @InputMap : IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnMousePosition(InputAction.CallbackContext context);
         void OnPrecisionMode(InputAction.CallbackContext context);
+    }
+    public interface IButtonMasherActions
+    {
+        void OnMashButton(InputAction.CallbackContext context);
     }
 }
