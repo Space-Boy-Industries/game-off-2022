@@ -252,7 +252,7 @@ GameObject:
   - component: {fileID: 1829035106}
   - component: {fileID: 1829035107}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: StartupHandler
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -285,14 +285,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 691e72c24abf5f4448bd9706c945355a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSize: 4
+  gridSize: 5
   startX: 0
   startY: 0
-  endX: 3
-  endY: 3
+  endX: 4
+  endY: 4
   marchX: 0
   marchY: 0
   marchVal: 0
   sceneCam: {fileID: 475795703}
-  straightPipe: {fileID: 2100000, guid: 02e903fa033fb73478eaa9e88f342a0e, type: 2}
-  cornerPipe: {fileID: 2100000, guid: 08dcbe931322107468bb98864fb602c1, type: 2}
+  straightPipe: {fileID: 21300000, guid: b6ad90740b148a345b92487cb2fccda4, type: 3}
+  cornerPipe: {fileID: 21300000, guid: 78049e777c229e84d9c8f460543cacb2, type: 3}
+  endPointPipe: {fileID: 21300000, guid: 76837db2b3944294b97d8ad86224db15, type: 3}
+  pipeBlank: {fileID: 21300000, guid: 5371a2ed94634cd44906d0423391079f, type: 3}

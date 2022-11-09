@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Random = UnityEngine.Random;
+using UnityEngine.InputSystem;
 
 public class LevelStartup : MonoBehaviour
 {
@@ -15,10 +16,11 @@ public class LevelStartup : MonoBehaviour
     public int marchY = 0;
     public int marchVal = 0;
     public Camera sceneCam;
-    public Material straightPipe;
-    public Material cornerPipe;
-    public Material endPointPipe;
-    public Material pipeBlank;
+    public Sprite straightPipe;
+    public Sprite cornerPipe;
+    public Sprite endPointPipe;
+    public Sprite pipeBlank;
+    public List<float[]> solution = new List<float[]>();
 
     // Start is called before the first frame update
     void Start()
@@ -29,13 +31,16 @@ public class LevelStartup : MonoBehaviour
         {
             for (int y = 0; y< gridSize; y++)
             {
-                objects[x,y] = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                objects[x,y] = new GameObject();
+                objects[x,y].AddComponent<SpriteRenderer>();
                 objects[x,y].gameObject.transform.position = new Vector3(x,y,0);
-                objects[x,y].GetComponent<Renderer>().material = pipeBlank;
+                objects[x,y].GetComponent<SpriteRenderer>().sprite = pipeBlank;
+                objects[x,y].AddComponent<BoxCollider>();
+                int rot = Random.Range(0, 4);
+                objects[x,y].gameObject.transform.rotation = Quaternion.Euler(0,0,rot*90);
             }
         }
         List<Vector2Int> path = new List<Vector2Int>();
-        int sway = Random.Range(0, 10);
         marchX = startX;
         marchY = startY;
         path.Add(new Vector2Int(marchX,marchY));
@@ -43,7 +48,6 @@ public class LevelStartup : MonoBehaviour
         {
             int signX = Math.Sign(endX-marchX);
             int signY = Math.Sign(endY-marchY);
-            sway = Random.Range(0, 10);
             int coin = Random.Range(0,2);
             if (coin == 0 && signX != 0) // if coinflip says x and can move in x direction
             {
@@ -71,19 +75,37 @@ public class LevelStartup : MonoBehaviour
         {
             if (i == 0 || i == path.Count-1)
             {
-                objects[path[i].x,path[i].y].GetComponent<Renderer>().material = endPointPipe;
+                objects[path[i].x,path[i].y].GetComponent<SpriteRenderer>().sprite = endPointPipe;
+                if (objects[path[i].x+1,path[i].y] && path[i].x+1 < gridSize) // right
+                {
+                    solution.Add(new float[] {90});
+                }
+                else if (objects[path[i].x-1,path[i].y] && path[i].x-1 > 0) // left
+                {
+                    solution.Add(new float[] {270});
+                }
+                else if (objects[path[i].x,path[i].y+1] && path[i].y+1 < gridSize) // up
+                {
+                    solution.Add(new float[] {0});
+                }
+                else if (objects[path[i].x-1,path[i].y] && path[i].y-1 > 0) // down
+                {
+                    solution.Add(new float[] {180});
+                }
             }
             else if (path[i].x == path[i-1].x +1 && path[i].x == path[i+1].x -1)
             {
-                objects[path[i].x,path[i].y].GetComponent<Renderer>().material = straightPipe;
+                objects[path[i].x,path[i].y].GetComponent<SpriteRenderer>().sprite = straightPipe;
+                solution.Add(new float[] {90,180});
             }
             else if (path[i].y == path[i-1].y +1 && path[i].y == path[i+1].y -1)
             {
-                objects[path[i].x,path[i].y].GetComponent<Renderer>().material = straightPipe;
+                objects[path[i].x,path[i].y].GetComponent<SpriteRenderer>().sprite = straightPipe;
+                solution.Add(new float[] {0,270});
             }
             else
             {
-                objects[path[i].x,path[i].y].GetComponent<Renderer>().material = cornerPipe;
+                objects[path[i].x,path[i].y].GetComponent<SpriteRenderer>().sprite = cornerPipe;
             }
         }
 
@@ -92,6 +114,16 @@ public class LevelStartup : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+         if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+             RaycastHit hit;
+             var ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+             
+             if (Physics.Raycast(ray, out hit)) 
+             {
+                var obj = hit.collider.gameObject;
+                obj.transform.rotation = Quaternion.Euler(0, 0, obj.transform.rotation.eulerAngles.z - 90);
+             }
+        }     
     }
 }
