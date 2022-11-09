@@ -159,8 +159,8 @@ Camera:
   m_GameObject: {fileID: 475795701}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -250,7 +250,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1829035106}
-  - component: {fileID: 1829035105}
+  - component: {fileID: 1829035107}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -258,27 +258,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1829035105
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1829035104}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 691e72c24abf5f4448bd9706c945355a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gridSize: 5
-  startX: 0
-  startY: 0
-  endX: 4
-  endY: 4
-  pathRand: 10
-  marchX: 0
-  marchY: 0
-  sceneCam: {fileID: 475795703}
 --- !u!4 &1829035106
 Transform:
   m_ObjectHideFlags: 0
@@ -294,3 +273,26 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1829035107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1829035104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 691e72c24abf5f4448bd9706c945355a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridSize: 4
+  startX: 0
+  startY: 0
+  endX: 3
+  endY: 3
+  marchX: 0
+  marchY: 0
+  marchVal: 0
+  sceneCam: {fileID: 475795703}
+  straightPipe: {fileID: 2100000, guid: 02e903fa033fb73478eaa9e88f342a0e, type: 2}
+  cornerPipe: {fileID: 2100000, guid: 08dcbe931322107468bb98864fb602c1, type: 2}
