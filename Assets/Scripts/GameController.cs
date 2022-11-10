@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour
     public GameObject cutsceneObject;
     public TMP_Text timerText;
     public TMP_Text resultText;
+    public TMP_Text difficultyText;
 
     private GameData _currentLevel;
     private MinigameController _currentMinigame;
@@ -156,11 +157,13 @@ public class GameController : MonoBehaviour
         // increase difficulty after a certain number of minigames
         foreach (var levelsPlayed in _currentLevel.DifficultyUpAfter)
         {
-            if (_nextMinigameIndex == levelsPlayed && _currentMinigame.Difficulty < MinigameDifficulty.Hard)
+            if (_nextMinigameIndex >= levelsPlayed && _currentMinigame.Difficulty < MinigameDifficulty.Hard)
             {
                 _currentMinigame.Difficulty++;
             }
         }
+        
+        difficultyText.text = _currentMinigame.Difficulty.ToString();
     }
 
     private void SetMiniGameCameraActive(bool active, string minigameScene)
@@ -179,6 +182,7 @@ public class GameController : MonoBehaviour
     private void SetMiniGameHudActive(bool active)
     {
         timerText.gameObject.SetActive(active);
+        difficultyText.transform.parent.gameObject.SetActive(active);
     } 
 
     void TransitionCutscene()
