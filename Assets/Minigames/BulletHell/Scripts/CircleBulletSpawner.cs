@@ -8,6 +8,7 @@ public class CircleBulletSpawner : BulletSpawner
     public int numberOfBullets = 10;
     public float bulletSize = 1f;
     public float bulletSpeed = 10f;
+    public float timeBetweenBullets = 0.075f;
     public GameObject bulletPrefab;
     public UnityEvent doneSpawningBullets;
 
@@ -44,7 +45,7 @@ public class CircleBulletSpawner : BulletSpawner
             
             var degree = (i * 15) % 360;
             SpawnBullet(pos, Quaternion.Euler(0, 0, degree) * Vector3.up, size, speed, prefab);
-            yield return new WaitForSeconds(0.075f);
+            yield return new WaitForSeconds(timeBetweenBullets);
         }
         
         doneSpawningBullets.Invoke();

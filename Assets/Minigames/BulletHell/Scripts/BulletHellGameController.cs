@@ -34,6 +34,12 @@ public class BulletHellGameController : MonoBehaviour
     private void Start()
     {
         _minigameController = GetComponent<MinigameController>();
+        
+        _minigameController.OnReady.AddListener(() =>
+        {
+            // preload bullet prefabs
+            SimplePool.Preload(bulletPrefab, 100, transform);
+        });
 
         _minigameController.OnStart.AddListener(() =>
         {
@@ -63,27 +69,21 @@ public class BulletHellGameController : MonoBehaviour
 
         _minigameController.OnEnd.AddListener(() =>
         {
+            // get all bulelts
             if (_player)
             {
                 _player.GetComponent<SimpleTopDownCharacterController>().onDeath.RemoveListener(OnPlayerDeath);
             }
+            
+            // destroy all bullets
+            var bullets = FindObjectsOfType<Bullet>();
+            foreach (var bullet in bullets)
+            {
+                SimplePool.Despawn(bullet.gameObject);
+            }
+            SimplePool.DestroyAll();
         });
     }
-    
-    // private void SpawnFireAtPlayer(Vector3 pos, int count, float size, float speed)
-    // {
-    //     StartCoroutine(SpawnFireAtPlayerRoutine(pos, count, size, speed));
-    // }
-    //
-    // private IEnumerator SpawnFireAtPlayerRoutine(Vector3 pos, int count, float size, float speed)
-    // {
-    //     for (var i = 0; i < count; i++)
-    //     {
-    //         var direction = (_player.transform.position - pos).normalized;
-    //         SpawnBullet(pos, direction, size, speed);
-    //         yield return new WaitForSeconds(0.5f);
-    //     }
-    // }
 
     // helper function to spawn collider wall
     private void SpawnCollider(Vector3 pos, Vector3 size)
@@ -111,21 +111,21 @@ public class BulletHellGameController : MonoBehaviour
         var circleSpawner = Instantiate(circleSpawnerPrefab, position, Quaternion.identity, transform);
         var circleSpawnerScript = circleSpawner.GetComponent<CircleBulletSpawner>();
         
+        // if game over happens, stop spawning bullets
+        _minigameController.OnEnd.AddListener(circleSpawnerScript.StopEarly);
+        
+        // when bullet spawner is finished, remove listener and decrement spawner count
+        circleSpawnerScript.doneSpawningBullets.AddListener(() =>
+        {
+            _minigameController.OnEnd.RemoveListener(circleSpawnerScript.StopEarly);
+            _spawnerCount--;
+        });
+        
         // wait for 1 second to give the players some time to react
-        StartCoroutine(Utility.CallbackAfter(1.0f, () =>
+        StartCoroutine(Utility.CallbackAfter(0.5f, () =>
         {
             // start spawning bullets
             circleSpawnerScript.StartSpawning(count, size, speed, bulletPrefab);
-        
-            // if game over happens, stop spawning bullets
-            _minigameController.OnEnd.AddListener(circleSpawnerScript.StopEarly);
-        
-            // when bullet spawner is finished, remove listener and decrement spawner count
-            circleSpawnerScript.doneSpawningBullets.AddListener(() =>
-            {
-                _minigameController.OnEnd.RemoveListener(circleSpawnerScript.StopEarly);
-                _spawnerCount--;
-            });
         }));
     }
     
@@ -138,13 +138,9 @@ public class BulletHellGameController : MonoBehaviour
     private void Update()
     {
         if (_minigameController.State != MinigameState.Playing) return;
-
         if (!_player) return;
         if (_spawnerCount >= maxSpawners) return;
-        
-        // random chance of spawning a bullet
-        if (Random.Range(0, 100) >= 1) return;
-        
+
         // random position within the camera bounds. then place position outside the circle
         var position = new Vector3(Random.Range(_minBounds.x, _maxBounds.x), Random.Range(_minBounds.y, _maxBounds.y), 0);
         var size = Random.Range(minBulletSize, maxBulletSize);

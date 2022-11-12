@@ -49,7 +49,7 @@ MonoBehaviour:
   spawnBulletsOnStart: 0
   numberOfBullets: 10
   bulletSize: 1
-  bulletSpeed: 10
+  bulletSpeed: 16
   bulletPrefab: {fileID: 0}
   doneSpawningBullets:
     m_PersistentCalls:

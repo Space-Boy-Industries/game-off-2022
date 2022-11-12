@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: BulletHellTestLevel
   m_EditorClassIdentifier: 
   MinigameScenes:
-  - ButtonMashing
   - BulletHell
   DifficultyUpAfter: 

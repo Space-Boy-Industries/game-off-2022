@@ -290,7 +290,7 @@ MonoBehaviour:
   minBulletSize: 0.8
   maxBulletSize: 0.9
   minBulletSpeed: 8
-  maxBulletSpeed: 12
+  maxBulletSpeed: 13
   minSpawnerBulletCount: 30
   maxSpawnerBulletCount: 100
   playerPrefab: {fileID: 882205197739369982, guid: 79b4d810b3539a2488f983e1c2ddcee0,
