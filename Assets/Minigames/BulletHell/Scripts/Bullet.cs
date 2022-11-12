@@ -17,8 +17,8 @@ public class Bullet : MonoBehaviour
     public float hitBoxRadius = 0.25f;
 
     private float _startTime;
-
-    private void Start()
+    
+    public void SetStarTime()
     {
         _startTime = Time.time;
     }
@@ -27,7 +27,7 @@ public class Bullet : MonoBehaviour
     {
         if (Time.time - _startTime > lifeTime)
         {
-            Destroy(gameObject);
+            SimplePool.Despawn(gameObject);
         }
     }
 
@@ -43,7 +43,7 @@ public class Bullet : MonoBehaviour
         {
             var shootable = hit.collider.gameObject.GetComponent<IShootable>();
             shootable?.OnShot(this);
-            Destroy(gameObject);
+            SimplePool.Despawn(gameObject);
         }
 
         transform.position += moveDirection * moveDistance;

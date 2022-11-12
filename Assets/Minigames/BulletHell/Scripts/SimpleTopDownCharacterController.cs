@@ -9,6 +9,8 @@ public class SimpleTopDownCharacterController : MonoBehaviour, IShootable
     public float acceleration = 10f;
     public float maxSpeed = 5f;
     public float maxPrecisionSpeed = 2f;
+    [Range(0.0f, 1.0f)]
+    public float deceleration = 0.85f;
     public int maxHealth = 100;
     
     // events
@@ -50,25 +52,11 @@ public class SimpleTopDownCharacterController : MonoBehaviour, IShootable
     private void FixedUpdate()
     {
         // apply acceleration
-        _velocity += _moveInput * (acceleration * Time.fixedDeltaTime);
-        
-        // clamp speed
-        _velocity = Vector2.ClampMagnitude(
-            _velocity,
-            _isPrecisionMode ? maxPrecisionSpeed : maxSpeed
-        );
+        _velocity = _moveInput.normalized * (_isPrecisionMode ? maxPrecisionSpeed : maxSpeed);
 
-        // apply drag
-        _velocity *= 0.9f;
-        
         // apply velocity
         var pos = transform.position;
         _rigidbody.MovePosition(pos + (Vector3)_velocity * Time.deltaTime);
-        
-        // rotate player towards mouse        
-        // var direction = _mousePos - (Vector2)_mainCamera.WorldToScreenPoint(pos);
-        // var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        // _rigidbody.MoveRotation(Quaternion.AngleAxis(angle, Vector3.forward));
     }
 
     public void Heal(int amount)
