@@ -108,7 +108,6 @@ public class GameController : MonoBehaviour
                     SetMiniGameHudActive(true);
                 });
 
-
                 // on end, determine what feedback texts to show
                 miniGame.OnEnd.AddListener(() =>
                 {

@@ -48,6 +48,8 @@ public class ButtonMashingGameController : MonoBehaviour
     
     private void OnMashButton(InputAction.CallbackContext context)
     {
+        if (Utility.IsPaused) return;
+        
         _score++;
         _score = Mathf.Clamp(_score, 0, scoreRequirement);
         
@@ -67,13 +69,8 @@ public class ButtonMashingGameController : MonoBehaviour
 
     private void Update()
     {
-        if (_inputMap.ButtonMasher.MashButton.ReadValue<float>() > 0)
-        {
-            spacebarImage.color = Color.gray;
-        }
-        else
-        {
-            spacebarImage.color = Color.white;
-        }
+        if (Utility.IsPaused) return;
+
+        spacebarImage.color = _inputMap.ButtonMasher.MashButton.ReadValue<float>() > 0 ? Color.gray : Color.white;
     }
 }
