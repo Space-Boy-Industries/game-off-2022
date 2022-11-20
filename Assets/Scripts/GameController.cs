@@ -9,11 +9,11 @@ public class GameController : MonoBehaviour
     public bool isMainInstance;
     public int autoPlayLevel = -1;
     public GameData[] levels;
-    public Camera transitionCamera;
     public int maxLife = 3;
+    public CutsceneController cutsceneController;
 
     // TODO: replace this when real art exists
-    public GameObject cutsceneObject;
+    public GameObject miniGameTutortialPlaceholder;
     public TMP_Text timerText;
     public TMP_Text resultText;
     public TMP_Text difficultyText;
@@ -93,17 +93,19 @@ public class GameController : MonoBehaviour
                 // setup the mini game to run
                 miniGame.OnReady.AddListener(() =>
                 {
-                    // disable cutscene camera and placeholder 
-                    transitionCamera.enabled = false;
-                    cutsceneObject.SetActive(false);
+                    // disable cutscene camera and placeholder
+                    cutsceneController.DisableCutsceneObjects();
 
                     // enable mini game camera after cutscene
                     SetMiniGameCameraActive(true, _currentLevel.MinigameScenes[_nextMinigameIndex]);
+                    
+                    miniGameTutortialPlaceholder.SetActive(true);
                 });
 
                 // start the mini game
                 miniGame.OnStart.AddListener(() =>
                 {
+                    miniGameTutortialPlaceholder.SetActive(false);
                     // enable minigame hud after controls
                     SetMiniGameHudActive(true);
                 });
@@ -192,7 +194,7 @@ public class GameController : MonoBehaviour
 
                 // set difficult text
                 difficultyText.text = _currentMinigame.Difficulty.ToString();
-                
+
                 callback?.Invoke(miniGame);
             }
         ));
@@ -232,17 +234,12 @@ public class GameController : MonoBehaviour
         {
             LoadNextMiniGame(null);
 
-            // TODO: start cutscene
-            transitionCamera.enabled = true;
-            cutsceneObject.SetActive(true);
-
-            // For now I'm just using CallbackAfter to simulate the cutscene playing
-            StartCoroutine(Utility.CallbackAfter(3f, () =>
-                {
-                    // start mini game
-                    _currentMinigame.Ready();
-                })
-            );
+            cutsceneController.EnableCutsceneObjects();
+            cutsceneController.StartTransition(() =>
+            {
+                // todo: wait until minigame is loaded if not loaded (never happens but is possible)
+                _currentMinigame.Ready();
+            });
         }
         else
         {
