@@ -47,6 +47,7 @@ public class MinigameController : MonoBehaviour
     };
 
     public MinigameType Type;
+    public string MiniGameName;
     public string ObjectivePrompt;
     public string[] ControlsPrompt;
 
