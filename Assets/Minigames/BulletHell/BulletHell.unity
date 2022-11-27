@@ -312,9 +312,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Type: 0
-  ObjectivePrompt: Smile More
+  MiniGameName: T03-H03 VIRUS
+  ObjectivePrompt: Survive
   ControlsPrompt:
-  - Smile More
+  - 'WASD: Move'
 --- !u!1 &1412125070
 GameObject:
   m_ObjectHideFlags: 0

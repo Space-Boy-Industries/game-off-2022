@@ -7,8 +7,18 @@ public class CutsceneController : MonoBehaviour
 {
     [SerializeField] private Animator cutsceneCameraAnimator;
     [SerializeField] private GameObject[] cutsceneObjects;
-    [SerializeField] private GameObject tempHackerText;
     [SerializeField] private float timeBetweenZoomOutAndIn = 2f;
+    [SerializeField] private float timeBeforeUpdateProgress = 0.8f;
+
+    [SerializeField] private GameObject tempHackerText;
+    [SerializeField] private TextProgressBar hackerTextProgressBar;
+
+    private float _currentProgress;
+
+    private void Start()
+    {
+        hackerTextProgressBar.Value = 0.0f;
+    }
 
     public void EnableCutsceneObjects()
     {
@@ -25,18 +35,23 @@ public class CutsceneController : MonoBehaviour
             obj.SetActive(false);
         }
     }
-    
+
+    public void SetProgressPercentage(float progressPercentage)
+    {
+        _currentProgress = progressPercentage;
+    }
+
     private static IEnumerator PlayAndWaitForAnimation(Animator anim, string stateName, Action callback)
     {
         anim.Play(stateName);
 
         yield return null;
-        
+
         while (anim.GetCurrentAnimatorStateInfo(0).IsName(stateName))
         {
             yield return null;
         }
-        
+
         callback?.Invoke();
     }
 
@@ -44,10 +59,7 @@ public class CutsceneController : MonoBehaviour
     {
         // TODO: replace hacker text with actual hack progress animation thing
         tempHackerText.SetActive(false);
-        StartCoroutine(PlayAndWaitForAnimation(cutsceneCameraAnimator, "Zoom In", () =>
-        {
-            callback?.Invoke();
-        }));
+        StartCoroutine(PlayAndWaitForAnimation(cutsceneCameraAnimator, "Zoom In", () => { callback?.Invoke(); }));
     }
 
     private void PlayZoomOutAnimation(Action callback)
@@ -57,21 +69,24 @@ public class CutsceneController : MonoBehaviour
         {
             // TODO: replace hacker text with actual hack progress animation thing
             tempHackerText.SetActive(true);
+
             callback?.Invoke();
         }));
     }
-    
+
     public void StartTransition(Action callback)
     {
         EnableCutsceneObjects();
         PlayZoomOutAnimation(() =>
         {
+            StartCoroutine(Utility.CallbackAfter(timeBeforeUpdateProgress,
+                    () => { hackerTextProgressBar.Value = _currentProgress; }
+                )
+            );
+            
             StartCoroutine(Utility.CallbackAfter(timeBetweenZoomOutAndIn, () =>
             {
-                PlayZoomInAnimation(() =>
-                {
-                    callback?.Invoke();
-                });
+                PlayZoomInAnimation(() => { callback?.Invoke(); });
             }));
         });
     }

@@ -11,9 +11,9 @@ public class GameController : MonoBehaviour
     public GameData[] levels;
     public int maxLife = 3;
     public CutsceneController cutsceneController;
+    public MiniGameTutorialController miniGameTutorialController;
 
     // TODO: replace this when real art exists
-    public GameObject miniGameTutortialPlaceholder;
     public TMP_Text timerText;
     public TMP_Text resultText;
     public TMP_Text difficultyText;
@@ -99,13 +99,14 @@ public class GameController : MonoBehaviour
                     // enable mini game camera after cutscene
                     SetMiniGameCameraActive(true, _currentLevel.MinigameScenes[_nextMinigameIndex]);
                     
-                    miniGameTutortialPlaceholder.SetActive(true);
+                    miniGameTutorialController.SetMiniGameData(miniGame);
+                    miniGameTutorialController.ShowMiniGameTutorial(true);
                 });
 
                 // start the mini game
                 miniGame.OnStart.AddListener(() =>
                 {
-                    miniGameTutortialPlaceholder.SetActive(false);
+                    miniGameTutorialController.ShowMiniGameTutorial(false);
                     // enable minigame hud after controls
                     SetMiniGameHudActive(true);
                 });
@@ -234,6 +235,7 @@ public class GameController : MonoBehaviour
         {
             LoadNextMiniGame(null);
 
+            cutsceneController.SetProgressPercentage((float)_nextMinigameIndex / (float)_currentLevel.MinigameScenes.Length);
             cutsceneController.EnableCutsceneObjects();
             cutsceneController.StartTransition(() =>
             {
